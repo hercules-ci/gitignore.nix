@@ -27,6 +27,22 @@ rec {
         last (last ([[true true]] ++ (filter head matched)))
     );
 
+  # TODO: we only care about the last match, so it seems we can do a reverse
+  #       scan per file and represent the outcome as true, false, and null for
+  #       nothing said => default to true after all rules are processed.
+  runFilterPattern' = r: path: type: last (last ([[true true]] ++ r (toString path) type));
+  filterPattern' = patterns: root:
+    (name: _type:
+      let
+        relPath = lib.removePrefix ((toString root) + "/") name;
+        matches = pair: (match (head pair) relPath) != null;
+        matched = map (pair: [(matches pair) (last pair)]) patterns;
+      in
+        filter head matched
+    );
+  mergePattern' = pa: pb: (name: type: pa name type ++ pb name type);
+  unitPattern' = name: type: [];
+
   # string -> [[regex bool]]
   gitignoreToPatterns = gitignore:
     assert throwIfOldNix;
@@ -90,4 +106,5 @@ rec {
       (split "\n" gitignore));
 
   gitignoreFilter = ign: root: filterPattern (gitignoreToPatterns ign) root;
+  gitignoreFilter' = ign: root: filterPattern' (gitignoreToPatterns ign) root;
 }
