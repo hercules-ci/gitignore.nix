@@ -1,1 +1,1 @@
-import ./tests/default.nix
+import ./tests/default.nix { pkgs = import ./nix {}; }
