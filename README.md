@@ -1,9 +1,19 @@
 
 # `gitignore` for Nix that just works
 
-This project lets you include local sources in your [Nix](https://builtwithnix.org) projects, while taking [gitignore files](https://git-scm.com/docs/gitignore) into account.
+This project lets you include local sources in your [Nix](https://builtwithnix.org) projects,
+while taking [gitignore files](https://git-scm.com/docs/gitignore) into account.
 
-# 'Installation'
+# Installation
+
+## Recommended with Niv
+```
+nix-env -iA niv -f https://github.com/nmattia/niv/tarball/master
+niv init
+niv add hercules-ci/gitignore
+```
+
+## Plain Nix way
 
 ```nix
 let
@@ -20,12 +30,6 @@ in
   <your nix expression>
 ```
 
-or
-
-```
-niv add hercules-ci/gitignore
-```
-
 # Usage
 
 ```nix
@@ -38,9 +42,9 @@ mkDerivation {
 # Features
 
  - Subdirectories just work
- - Hashes only change when output changes
+ - Source hashes only change when output changes
  - Not impacted by large or inaccessible ignored directories
- - Composes with cleanSourceWith
+ - Composes with `cleanSourceWith`
  - Reads user git configuration; no need to bother your team with your tool config.
  - Also works with restrict-eval enabled (if avoiding `fetchFromGitHub`)
  - No import from derivation ("IFD")
