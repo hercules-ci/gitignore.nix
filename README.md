@@ -41,7 +41,7 @@ mkDerivation {
 
 # Features
 
- - Subdirectories just work
+ - Reads parent gitignores even if only pointed at a subdirectory
  - Source hashes only change when output changes
  - Not impacted by large or inaccessible ignored directories
  - Composes with `cleanSourceWith`
