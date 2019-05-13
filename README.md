@@ -49,6 +49,31 @@ mkDerivation {
  - Also works with restrict-eval enabled (if avoiding `fetchFromGitHub`)
  - No import from derivation ("IFD")
 
+## Comparison
+
+| Feature \ Implementation | cleanSource | [siers](https://github.com/siers/nix-gitignore) | [siers recursive](https://github.com/siers/nix-gitignore) | [icetan](https://github.com/icetan/nix-git-ignore-source) | [Profpatsch](https://github.com/Profpatsch/nixperiments/blob/master/filterSourceGitignore.nix) | [numtide](https://github.com/numtide/nix-gitignore) | this project
+|-|-|-|-|-|-|-|-|
+|Ignores .git                             | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ 
+|No special Nix configuration             | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ |   | ✔️ 
+|No import from derivation                | ✔️ | ✔️ |   | ✔️ | ✔️ | ✔️ | ✔️ 
+|Uses subdirectory gitignores             |   |   | ✔️ |   |   | ✔️ | ✔️ 
+|Uses parent gitignores                   |   |   |   |   |   |✔️ ?| ✔️ 
+|Uses user gitignores                     |   |   |   |   |   | ✔️ | ✔️ 
+|Works with `restrict-eval` / Hydra       | ✔️ | ✔️ |   | ✔️ | ✔️ |   | ✔️
+|Included in nixpkgs                      | ✔️ | ✔️ | ✔️ |   |   |   |
+<!-- |No traversal of ignored dirs             | - | ✔️ |✔️ ?| ✔️ |✔️ ?|✔️ ?| ✔️ ? -->
+
+|   | Legend |
+|---|-------------------------------------|
+|✔️  | Supported
+|✔️ ?| Probably supported
+|   | Probably not supported
+|?  | Probably not supported
+|-  | Not applicable or depends
+
+
+Please open a PR if you've found another feature, determined any of the '?' or found an inaccuracy!
+
 # Contributing
 
 This project isn't perfect (yet) so please submit test cases and fixes as pull requests. Before doing anything drastic, it's a good idea to open an issue first to discuss and optimize the approach.
