@@ -1,5 +1,5 @@
 
-# `gitignore` for Nix that just works
+# `gitignore` for Nix
 
 This project lets you include local sources in your [Nix](https://builtwithnix.org) projects,
 while taking [gitignore files](https://git-scm.com/docs/gitignore) into account.
