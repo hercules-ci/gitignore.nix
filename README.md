@@ -67,7 +67,7 @@ mkDerivation {
 |---|-------------------------------------|
 |✔️  | Supported
 |✔️ ?| Probably supported
-|   | Probably not supported
+|   | Not supported
 |?  | Probably not supported
 |-  | Not applicable or depends
 
