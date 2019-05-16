@@ -1,8 +1,10 @@
 
 # Make Nix precisely emulate gitignore
 
-This project lets you include local sources in your [Nix](https://builtwithnix.org) projects,
+This goal of this project lets you include local sources in your [Nix](https://builtwithnix.org) projects,
 while taking [gitignore files](https://git-scm.com/docs/gitignore) into account.
+
+Note that although this project does a good job at emulating git's behavior, it is not the same implementation!
 
 # Installation
 
