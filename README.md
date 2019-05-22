@@ -63,6 +63,7 @@ mkDerivation {
 |Uses user gitignores                     |   |   |   |   |   | ✔️ | ✔️ 
 |Has a test suite                         |   | ✔️ | ✔️ | ✔️ |   | ? | ✔️
 |Works with `restrict-eval` / Hydra       | ✔️ | ✔️ |   | ✔️ | ✔️ |   | ✔️
+|Descends into submodule correctly        |   | ? | ? | ? | ? |✔️ ?| ? #8 
 |Included in nixpkgs                      | ✔️ | ✔️ | ✔️ |   |   |   |
 <!-- |No traversal of ignored dirs             | - | ✔️ |✔️ ?| ✔️ |✔️ ?|✔️ ?| ✔️ ? -->
 
