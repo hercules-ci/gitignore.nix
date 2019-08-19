@@ -4,5 +4,10 @@ let
 in
 {
   inherit (find-files) gitignoreFilter;
-  gitignoreSource = p: lib.cleanSourceWith { filter = find-files.gitignoreFilter p; src = p; };
+  
+  gitignoreSource = path: builtins.path {
+    name = "source";
+    filter = find-files.gitignoreFilter path;
+    inherit path;
+  };
 }
