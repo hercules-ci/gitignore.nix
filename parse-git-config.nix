@@ -18,7 +18,7 @@
 #
 { lib ? import <nixpkgs/lib>, ... }:
 let
-  inherit (lib.strings) splitString hasPrefix removePrefix removeSuffix hasInfix replaceStrings;
+  inherit (lib.strings) splitString hasPrefix removePrefix removeSuffix replaceStrings;
   inherit (lib.lists) foldl' head tail;
 
   parseIniText = text:
@@ -33,7 +33,7 @@ let
         then r // {
           section = removePrefix "[" (removeSuffix "]" line);
         }
-        else if hasInfix "=" line then
+        else if builtins.match ".*=.*" line != null then
         let
           s = splitString "=" line;
           s0 = head s;
