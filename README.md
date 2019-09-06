@@ -46,6 +46,7 @@ mkDerivation {
  - Reads parent gitignores even if only pointed at a subdirectory
  - Source hashes only change when output changes
  - Not impacted by large or inaccessible ignored directories
+ - Composes with `cleanSourceWith`
  - Reads user git configuration; no need to bother your team with your tool config.
  - Also works with restrict-eval enabled (if avoiding `fetchFromGitHub`)
  - No import from derivation ("IFD")
