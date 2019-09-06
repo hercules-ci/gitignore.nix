@@ -24,9 +24,9 @@ rec {
       basePathStr = toString basePath;
     in
       path: type: let
-        localPath = removePrefix basePathStr (toString path);
-        localPathElements = splitString "/" localPath;
-      in parse-gitignore.runFilterPattern' (getPatterns patternsBelowP localPathElements)."/patterns" path type;
+        localDirPath = removePrefix basePathStr (toString (dirOf path));
+        localDirPathElements = splitString "/" localDirPath;
+      in parse-gitignore.runFilterPattern' (getPatterns patternsBelowP localDirPathElements)."/patterns" path type;
 
   getPatterns =
     patternTree: pathElems:
