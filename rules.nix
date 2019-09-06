@@ -3,7 +3,7 @@
  */
 let
   inherit (builtins) compareVersions nixVersion split match;
-  inherit (lib) elemAt length head filter isList;
+  inherit (lib) elemAt length head filter isList reverseList foldl';
   inherit (lib.strings) substring stringLength replaceStrings concatStringsSep;
 
   debug = a: builtins.trace a a;
@@ -16,35 +16,74 @@ let
 
 in
 rec {
-  # [["good/relative/source/file" true] ["bad.tmpfile" false]] -> root -> path
-  filterPattern = patterns: root:
-    (name: _type:
+
+  # type patternFunction = path -> type -> nullOr bool
+  #
+  # As used here
+
+  # type filterFunction = path -> type -> bool
+  #
+  # As used by cleanSourceWith, builtins.path, filterSource
+
+  # patternFunction -> filterFunction
+  #
+  # Make a patternFunction usable for cleanSourceWith etc.
+  #
+  # null values (unmatched) are converted to true (included).
+  runFilterPattern =
+    r: path: type:
       let
-        relPath = lib.removePrefix ((toString root) + "/") name;
-        matches = pair: (match (head pair) relPath) != null;
-        matched = map (pair: [(matches pair) (last pair)]) patterns;
+        result = r (toString path) type;
       in
-        last (last ([[true true]] ++ (filter head matched)))
+        if result == null
+        then true
+        else result;
+
+  # [["good/relative/source/file" true] ["bad.tmpfile" false]] -> root -> path -> nullOr bool
+  filterPattern = patterns: root:
+    let
+      # Last item has the last say; might as well start there
+      reversed = reverseList patterns;
+
+      matchers = map (pair: let regex = match (head pair);
+                            in relPath:
+                                 if regex relPath == null
+                                 then null
+                                 else last pair
+                     ) reversed;
+
+    in
+      name: _type:
+        let
+          relPath = lib.removePrefix ((toString root) + "/") name;
+        in
+          # Ideally we'd use foldr, but that crashes on big lists. At least we don't
+          # have to actually match any patterns after we encounter a match.
+          foldl'
+            (result: matcher:
+             if result == null
+             then matcher relPath
+             else result)
+            null
+            matchers
+          ;
+
+  # Combine the result of two pattern functions such that the later functions
+  # may override the result of preceding ones.
+  mergePattern = pa: pb: (name: type:
+    let ra = pa name type;
+        rb = pb name type;
+    in if rb != null
+       then rb
+       else ra
     );
 
-  # TODO: we only care about the last match, so it seems we can do a reverse
-  #       scan per file and represent the outcome as true, false, and null for
-  #       nothing said => default to true after all rules are processed.
-  runFilterPattern' = r: path: type: last (last ([[true true]] ++ r (toString path) type));
-  filterPattern' = patterns: root:
-    (name: _type:
-      let
-        relPath = lib.removePrefix ((toString root) + "/") name;
-        matches = pair: (match (head pair) relPath) != null;
-        matched = map (pair: [(matches pair) (last pair)]) patterns;
-      in
-        filter head matched
-    );
-  mergePattern' = pa: pb: (name: type: pa name type ++ pb name type);
-  unitPattern' = name: type: [];
+  # mergePattern unitPattern x == x
+  # mergePattern x unitPattern == x
+  unitPattern = name: type: null;
 
   # string -> [[regex bool]]
-  gitignoreToPatterns = gitignore:
+  gitignoreToRegexes = gitignore:
     assert throwIfOldNix;
     let
       # ignore -> bool
@@ -105,6 +144,5 @@ rec {
       (filter (l: !isList l && !isComment l)
       (split "\n" gitignore));
 
-  gitignoreFilter = ign: root: filterPattern (gitignoreToPatterns ign) root;
-  gitignoreFilter' = ign: root: filterPattern' (gitignoreToPatterns ign) root;
+  gitignoreFilter = ign: root: filterPattern (gitignoreToRegexes ign) root;
 }
