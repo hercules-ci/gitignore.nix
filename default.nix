@@ -5,9 +5,9 @@ in
 {
   inherit (find-files) gitignoreFilter;
   
-  gitignoreSource = path: builtins.path {
+  gitignoreSource = path: lib.cleanSourceWith {
     name = "source";
     filter = find-files.gitignoreFilter path;
-    inherit path;
+    src = path;
   };
 }
