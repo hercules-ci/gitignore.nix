@@ -50,6 +50,7 @@ mkDerivation {
  - Reads user git configuration; no need to bother your team with your tool config.
  - Also works with restrict-eval enabled (if avoiding `fetchFromGitHub`)
  - No import from derivation ("IFD")
+ - Name and hash are not sensitive to checkout location
 
 ## Comparison
 
