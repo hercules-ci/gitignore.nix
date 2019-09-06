@@ -26,18 +26,23 @@ rec {
       path: type: let
         localPath = removePrefix basePathStr (toString path);
         localPathElements = splitString "/" localPath;
-        getPatterns = patternTree: pathElems:
-          if length pathElems == 0
-          then patternTree
-          else let hd = head pathElems; in 
-            if hd == "" || hd == "."
-            then getPatterns patternTree (tail pathElems)
-            else if hasAttr hd patternTree
-                 then getPatterns patternTree."${hd}" (tail pathElems)
-                 else patternTree # Files are not in the tree, so we return the
-                                  # most patterns we could find here.
-          ;
       in parse-gitignore.runFilterPattern' (getPatterns patternsBelowP localPathElements)."/patterns" path type;
+
+  getPatterns =
+    patternTree: pathElems:
+      if length pathElems == 0
+      then patternTree
+      else let hd = head pathElems; in
+        if hd == "" || hd == "."
+        then getPatterns patternTree (tail pathElems)
+        else
+          if hasAttr hd patternTree
+          then getPatterns patternTree."${hd}" (tail pathElems)
+          else
+            # Files are not in the tree, so we return the
+            # most patterns we could find here.
+            patternTree;
+
 
   #####
   # Constructing a tree of patterns per non-ignored subdirectory, recursively
