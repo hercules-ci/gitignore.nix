@@ -30,6 +30,9 @@ let
         touches 5-directory      {1,2,3,4,5,^,$,^$,$^,[,[[,],]],]]],ab,bb,\\,\\\\}
 
         touches 9-expected       {unfiltered,filtered-via-aux-{filter,ignore,filepath}}
+
+        touches 10-subdir-ignoring-itself/foo {foo,bar}
+        echo foo >10-subdir-ignoring-itself/foo/.gitignore
     ); }
 
     create-tree "$1"
