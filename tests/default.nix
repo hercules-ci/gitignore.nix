@@ -20,5 +20,6 @@ in
   subdir-3 = runner.makeTest { name = "subdir-3"; rootDir = testdata.sourceUnfiltered + "/test-tree"; subpath = "3-wildcards"; };
   subdir-4 = runner.makeTest { name = "subdir-4"; rootDir = testdata.sourceUnfiltered + "/test-tree"; subpath = "4-escapes"; };
   subdir-9 = runner.makeTest { name = "subdir-9"; rootDir = testdata.sourceUnfiltered + "/test-tree"; subpath = "9-expected"; };
+  subdir-10 = runner.makeTest { name = "subdir-10"; rootDir = testdata.sourceUnfiltered + "/test-tree"; subpath = "10-subdir-ignoring-itself"; };
 
 }
