@@ -25,7 +25,7 @@ in
     else
       path:
         if path ? _isLibCleanSourceWith
-        then builtins.abort "Sorry, please update your Nixpkgs if you want to use gitignoreSource on cleanSourceWith"
+        then builtins.abort "Sorry, please update your Nixpkgs to 19.09 or master if you want to use gitignoreSource on cleanSourceWith"
         else builtins.path {
           name = "source";
           filter = find-files.gitignoreFilter path;
