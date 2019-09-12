@@ -16,7 +16,6 @@ rec {
   #         - readLines function with CRLF support
   # TODO: check assumption that a relative core.excludesFile is relative to HOME
   # TODO: write test for trailing slash (matches dir only)
-  # TODO: rename Pattern'
 
   gitignoreFilter = basePath:
     let
@@ -26,7 +25,7 @@ rec {
       path: type: let
         localDirPath = removePrefix basePathStr (toString (dirOf path));
         localDirPathElements = splitString "/" localDirPath;
-      in parse-gitignore.runFilterPattern' (getPatterns patternsBelowP localDirPathElements)."/patterns" path type;
+      in parse-gitignore.runFilterPattern (getPatterns patternsBelowP localDirPathElements)."/patterns" path type;
 
   getPatterns =
     patternTree: pathElems:
@@ -58,10 +57,10 @@ rec {
   findPatternsTree = dir:
     let
       listOfStartingPatterns = map ({contextDir, file, ...}: 
-                                 parse-gitignore.gitignoreFilter' (readFile file) contextDir
+                                 parse-gitignore.gitignoreFilter (readFile file) contextDir
                               ) (findAncestryGitignores dir);
       startingPatterns = builtins.foldl'
-                           parse-gitignore.mergePattern'
+                           parse-gitignore.mergePattern
                            (defaultPatterns dir) # not the unit of merge but a set of defaults
                            listOfStartingPatterns;
     in
@@ -79,21 +78,21 @@ rec {
     let nodes = readDir dir;
         dirs = filterAttrs (name: type:
                               type == nodeTypes.directory && 
-                              (parse-gitignore.runFilterPattern' currentPatterns (dir + "/${name}") type)
+                              (parse-gitignore.runFilterPattern currentPatterns (dir + "/${name}") type)
                            ) nodes;
     in mapAttrs (name: _t:
       let subdir = dir + "/${name}";
           ignore = subdir + "/.gitignore";
           newPatterns = map (file:
-              parse-gitignore.mergePattern'
+              parse-gitignore.mergePattern
                 currentPatterns  # Performance: this is where you could potentially filter out patterns irrelevant to subdir
-                (parse-gitignore.gitignoreFilter' (readFile file) subdir)
+                (parse-gitignore.gitignoreFilter (readFile file) subdir)
             ) (guardFile ignore);
           subdirPatterns = headOr currentPatterns newPatterns;
       in 
         findDescendantPatternsTree subdirPatterns subdir
     ) dirs // { "/patterns" = currentPatterns; };
-  defaultPatterns = root: parse-gitignore.gitignoreFilter' ".git" root; # no trailing slash, because of worktree references
+  defaultPatterns = root: parse-gitignore.gitignoreFilter ".git" root; # no trailing slash, because of worktree references
 
 
   #####
