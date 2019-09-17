@@ -11,4 +11,3 @@ let
     import ../tests/default.nix { pkgs = import ./default.nix { inherit nixpkgs; }; }
   )
 
-#import ./tests/default.nix { pkgs = import ./nix {}; }
