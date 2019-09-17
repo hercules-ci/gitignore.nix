@@ -6,9 +6,9 @@ in
 rec {
   inherit (builtins) dirOf baseNameOf abort split hasAttr readFile readDir;
   inherit (lib.lists) filter length head tail concatMap take;
-  inherit (lib.attrsets) filterAttrs mapAttrs;
+  inherit (lib.attrsets) filterAttrs mapAttrs attrNames;
   inherit (lib.strings) hasPrefix removePrefix splitString;
-  inherit (lib) strings flip;
+  inherit (lib) strings flip any;
   inherit lib;
   inherit parse-ini;
 
@@ -25,7 +25,10 @@ rec {
       path: type: let
         localDirPath = removePrefix basePathStr (toString (dirOf path));
         localDirPathElements = splitString "/" localDirPath;
-      in parse-gitignore.runFilterPattern (getPatterns patternsBelowP localDirPathElements)."/patterns" path type;
+        patternResult = parse-gitignore.runFilterPattern (getPatterns patternsBelowP localDirPathElements)."/patterns" path type;
+        nonempty = any (nodeName: gitignoreFilter (basePath + "/${nodeName}") != false)
+                       (attrNames (builtins.readDir path));
+      in patternResult && (type == "directory" -> nonempty);
 
   getPatterns =
     patternTree: pathElems:
