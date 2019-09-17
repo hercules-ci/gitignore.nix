@@ -15,6 +15,8 @@ let
     create-tree() { (
         mkdir -p "$1"; cd "$1"
 
+        touch '#' '#ignored'
+
         touches 1-simpl          {1,2,3,4,5,^,$,^$,$^,[,[[,],]],]]],ab,bb,\\,\\\\,simple-test}
         touches 1-simpl/1-simpl  {1,2,3,4,5,^,$,^$,$^,[,[[,],]],]]],ab,bb,\\,\\\\,simpletest}
         touches 1-xxxxx/1-simpl  {1,2}
@@ -28,6 +30,13 @@ let
         touches 4-escapes        {{*,o{,_,__,?,}ther}.html,other.html{,\$,\$\$}}
 
         touches 5-directory      {1,2,3,4,5,^,$,^$,$^,[,[[,],]],]]],ab,bb,\\,\\\\}
+
+        mkdir 6-hash
+        touch '6-hash/a' '6-hash/a#0' '6-hash/a\#1' '6-hash/a\\#2'
+        touch '6-hash/b' '6-hash/b#0' '6-hash/b\#1' '6-hash/b\\#2'
+        touch '6-hash/c' '6-hash/c#0' '6-hash/c\#1' '6-hash/c\\#2'
+        touch '6-hash/d' '6-hash/d#0' '6-hash/d\#1' '6-hash/d\\#2'
+        touch '6-hash/z' '6-hash/z#0' '6-hash/z\#1' '6-hash/z\\#2'
 
         touches 9-expected       {unfiltered,filtered-via-aux-{filter,ignore,filepath}}
 
@@ -73,6 +82,15 @@ let
     4-*/other.html$
 
     5-*/
+
+    # A hash sign on a line
+    #
+
+    6-hash/a*#
+    6-hash/b*\#
+    6-hash/c*\\#
+    6-hash/d*\\\#
+    6-hash/z*
   '';
 
   ignoresAux = "/9-expected/*filepath\n";
