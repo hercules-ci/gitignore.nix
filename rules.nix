@@ -105,10 +105,14 @@ rec {
             in str : recurse str;
           chars = s: filter (c: c != "" && !isList c) (splitString s);
           escape = s: map (c: "\\" + c) (chars s);
+
+          # The "#" character normally starts a comment, but can be escaped with a
+          # backslash to be a literal # in the pattern.
+          unescapes = "#";
         in
           replaceStrings
-            ((chars special)  ++ (escape escs) ++ ["**/"    "**" "*"     "?"])
-            ((escape special) ++ (escape escs) ++ ["(.*/)?" ".*" "[^/]*" "[^/]"]);
+            ((chars special)  ++ (escape unescapes) ++ (escape escs) ++ ["**/"    "**" "*"     "?"])
+            ((escape special) ++ (chars unescapes)  ++ (escape escs) ++ ["(.*/)?" ".*" "[^/]*" "[^/]"]);
 
       # (regex -> regex) -> regex -> regex
       mapAroundCharclass = f: r: # rl = regex or list
