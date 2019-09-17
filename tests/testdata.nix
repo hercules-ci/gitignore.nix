@@ -33,6 +33,10 @@ let
 
         touches 10-subdir-ignoring-itself/foo {foo,bar}
         echo foo >10-subdir-ignoring-itself/foo/.gitignore
+
+        mkdir 12-empty-dir
+        mkdir 12-not-empty-dir
+        touch 12-not-empty-dir/just-a-regular-file
     ); }
 
     create-tree "$1"
