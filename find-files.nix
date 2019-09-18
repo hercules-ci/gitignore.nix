@@ -129,6 +129,7 @@ rec {
   inspectDirAndUp = dirPath: let
       go = p: acc:
         let
+          parentDir = dirOf p;
           dirInfo = inspectDir p;
           isHighest = dirInfo.isWorkTreeRoot || p == /. || p == "/";
           dirs = [dirInfo] ++ acc;
@@ -138,7 +139,7 @@ rec {
             else [];
 
         in
-          if isHighest
+          if isHighest || isForbiddenDir (parentDir)
           then
             {
               localIgnores = concatMap getIgnores dirs;
@@ -146,9 +147,18 @@ rec {
               inherit (dirInfo) gitDir;
             }
           else
-            go (dirOf p) dirs
+            go parentDir dirs
       ;
     in go dirPath [];
+
+  # isForbiddenDir: string -> bool
+  #
+  # Some directories should never be traversed when looking for .git
+  #  - for performance
+  #  - to help lorri and possibly other tools that monitor which paths are read
+  #    during evaluation
+  isForbiddenDir = p:
+    p == builtins.storeDir || p == "/";
 
   # TODO: only readDir lazily for the .git type. Rest can be done efficiently with pathExists
   inspectDir = dirPath:
