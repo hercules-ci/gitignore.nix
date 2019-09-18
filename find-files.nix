@@ -158,7 +158,7 @@ rec {
   #  - to help lorri and possibly other tools that monitor which paths are read
   #    during evaluation
   isForbiddenDir = p:
-    p == builtins.storePath || p == "/";
+    p == builtins.storeDir || p == "/";
 
   # TODO: only readDir lazily for the .git type. Rest can be done efficiently with pathExists
   inspectDir = dirPath:
