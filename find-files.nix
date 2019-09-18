@@ -139,7 +139,7 @@ rec {
             else [];
 
         in
-          if isHighest || isForbiddenDir (parentDir)
+          if isHighest || isForbiddenDir (toString parentDir)
           then
             {
               localIgnores = concatMap getIgnores dirs;
