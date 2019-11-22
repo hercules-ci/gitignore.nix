@@ -167,7 +167,9 @@ rec {
       isWorkTreeRoot = pathExists (dirPath + "/.git");
       gitDir = if dotGitType == nodeTypes.directory then dirPath + "/.git"
                else if dotGitType == nodeTypes.regular then readDotGitFile (dirPath + "/.git")
-               else throw ".git is a symlink. Teach me what that means.";
+               else if dotGitType == nodeTypes.symlink then throw "gitignore.nix: ${toString dirPath}/.git is a symlink. This is not supported (yet?)."
+               else if dotGitType == null then null
+               else throw "gitignore.nix: ${toString dirPath}/.git is of unknown node type ${dotGitType}";
 
       # directory should probably be ignored here, but to figure out the node type, we
       # currently don't have a builtin to do it directly and readDir is expensive,
