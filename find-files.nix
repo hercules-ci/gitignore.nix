@@ -160,16 +160,19 @@ rec {
   isForbiddenDir = p:
     p == builtins.storeDir || p == "/";
 
-  # TODO: only readDir lazily for the .git type. Rest can be done efficiently with pathExists
   inspectDir = dirPath:
     let
       d = readDir dirPath;
       dotGitType = d.".git" or null;
-      isWorkTreeRoot = dotGitType != null;
+      isWorkTreeRoot = pathExists (dirPath + "/.git");
       gitDir = if dotGitType == nodeTypes.directory then dirPath + "/.git"
                else if dotGitType == nodeTypes.regular then readDotGitFile (dirPath + "/.git")
-               else dotGitType;
-      hasGitignore = (d.".gitignore" or null) == nodeTypes.regular;
+               else throw ".git is a symlink. Teach me what that means.";
+
+      # directory should probably be ignored here, but to figure out the node type, we
+      # currently don't have a builtin to do it directly and readDir is expensive,
+      # particularly for a tool like lorri.
+      hasGitignore = pathExists (dirPath + "/.gitignore");
     in { inherit isWorkTreeRoot hasGitignore gitDir dirPath; };
   
   /* .git file path -> GIT_DIR
