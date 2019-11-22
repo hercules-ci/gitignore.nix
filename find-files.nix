@@ -203,9 +203,9 @@ rec {
 
   maybeXdgGitConfigFile = 
     for
-      (guardNonEmptyString (/. + builtins.getEnv "XDG_CONFIG_HOME"))
+      (guardNonEmptyString (builtins.getEnv "XDG_CONFIG_HOME"))
       (xdgConfigHome:
-        guardFile (xdgConfigHome + "/git/config")
+        guardFile (/. + xdgConfigHome + "/git/config")
       );
   maybeGlobalConfig = take 1 (guardFile ~/.gitconfig
                            ++ maybeXdgGitConfigFile
@@ -226,9 +226,9 @@ rec {
       )
     );
   xdgExcludesFile = for
-    (guardNonEmptyString (/. + builtins.getEnv "XDG_CONFIG_HOME"))
+    (guardNonEmptyString (builtins.getEnv "XDG_CONFIG_HOME"))
     (xdgConfigHome:
-      guardFile (xdgConfigHome + "/git/ignore")
+      guardFile (/. + xdgConfigHome + "/git/ignore")
     );
   maybeGlobalIgnoresFile = take 1
                             ( globalConfiguredExcludesFile
