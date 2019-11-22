@@ -4,7 +4,7 @@ let
   parse-gitignore = import ./rules.nix { inherit lib; };
 in
 rec {
-  inherit (builtins) dirOf baseNameOf abort split hasAttr readFile readDir;
+  inherit (builtins) dirOf baseNameOf abort split hasAttr readFile readDir pathExists;
   inherit (lib.lists) filter length head tail concatMap take;
   inherit (lib.attrsets) filterAttrs mapAttrs attrNames;
   inherit (lib.strings) hasPrefix removePrefix splitString;
@@ -27,7 +27,7 @@ rec {
         localDirPathElements = splitString "/" localDirPath;
         patternResult = parse-gitignore.runFilterPattern (getPatterns patternsBelowP localDirPathElements)."/patterns" path type;
         nonempty = any (nodeName: gitignoreFilter (basePath + "/${nodeName}") != false)
-                       (attrNames (builtins.readDir path));
+                       (attrNames (readDir path));
       in patternResult && (type == "directory" -> nonempty);
 
   getPatterns =
@@ -162,7 +162,7 @@ rec {
 
   # TODO: only readDir lazily for the .git type. Rest can be done efficiently with pathExists
   inspectDir = dirPath:
-    let 
+    let
       d = readDir dirPath;
       dotGitType = d.".git" or null;
       isWorkTreeRoot = dotGitType != null;
@@ -280,7 +280,7 @@ rec {
    */
   safeGetNodeType = path:
     if toString path == "/" then nodeTypes.directory
-    else if builtins.pathExists path
+    else if pathExists path
     then let parentDir = readDir (dirOf path);
          in parentDir."${baseNameOf path}" or null
     else null;
