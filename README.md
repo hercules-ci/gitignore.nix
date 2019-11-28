@@ -41,6 +41,8 @@ mkDerivation {
 }
 ```
 
+If you need something more specific, that can not be achieved with Nixpkgs' `cleanSourceWith` function, you may want to use [gitignoreFilter](docs/gitignoreFilter.md).
+
 # Features
 
  - Reads parent gitignores even if only pointed at a subdirectory

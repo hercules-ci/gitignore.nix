@@ -257,12 +257,16 @@ rec {
   nullableToList = x: if x == null then [] else [x];
   for = l: f: concatMap f l;
   guard = b: if b then [{}] else [];
-  guardProperFile = p: if nodeTypes.isFile (safeGetNodeType p) then [p] else [];
 
-  # guardFile
-  # Like guardProperFile but avoid reading a directory. This can't check whether
-  # it's actually a file, rather than something else, but that's worth it for
-  # (lorri) performance.
+  /*
+     Check whether a path exists; if it does, return it as a singleton list.
+
+     Currently it checks whether a path exists, but we'd like to check the
+     node type, so we don't try to readFile for example a directory if we don't
+     have to.
+     It can be done with readDir but this causes lorri to watch everything,
+     which is really bad when reading for example ~/.gitconfig.
+   */
   # TODO: get something like builtins.pathType or builtins.stat into Nix
   guardFile = p: if pathExists p then [p] else [];
   guardNonEmptyString = s: if s == "" then [s] else [];
