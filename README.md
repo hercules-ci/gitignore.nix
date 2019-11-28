@@ -79,6 +79,13 @@ mkDerivation {
 
 Please open a PR if you've found another feature, determined any of the '?' or found an inaccuracy!
 
+# Security
+
+Files not matched by gitignore rules will end up in the Nix store, which is readable by any process.
+
+gitignore.nix does not yet understand `git-crypt`'s metadata, so don't call `gitignoreSource` on directories containing such secrets or their parent directories.
+This applies to any Nix function that uses the `builtins.path` or `builtins.filterSource` functions.
+
 # Contributing
 
 This project isn't perfect (yet) so please submit test cases and fixes as pull requests. Before doing anything drastic, it's a good idea to open an issue first to discuss and optimize the approach.
