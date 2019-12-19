@@ -41,7 +41,8 @@ mkDerivation {
 }
 ```
 
-If you need something more specific, that can not be achieved with Nixpkgs' `cleanSourceWith` function, you may want to use [gitignoreFilter](docs/gitignoreFilter.md).
+You can use Nixpkgs' [`cleanSourceWith`](https://github.com/NixOS/nixpkgs/blob/d1bb36d5cb5b78111f799eb26f5f17e5979bc746/lib/sources.nix#L35-L67) to compose with other filters (by logical _and_) or to set a `name`.
+If you need something more exotic, you may want to use [gitignoreFilter](docs/gitignoreFilter.md) directly.
 
 # Features
 
@@ -80,6 +81,13 @@ If you need something more specific, that can not be achieved with Nixpkgs' `cle
 
 
 Please open a PR if you've found another feature, determined any of the '?' or found an inaccuracy!
+
+# Security
+
+Files not matched by gitignore rules will end up in the Nix store, which is readable by any process.
+
+gitignore.nix does not yet understand `git-crypt`'s metadata, so don't call `gitignoreSource` on directories containing such secrets or their parent directories.
+This applies to any Nix function that uses the `builtins.path` or `builtins.filterSource` functions.
 
 # Contributing
 
