@@ -41,6 +41,9 @@ mkDerivation {
 }
 ```
 
+You can use Nixpkgs' [`cleanSourceWith`](https://github.com/NixOS/nixpkgs/blob/d1bb36d5cb5b78111f799eb26f5f17e5979bc746/lib/sources.nix#L35-L67) to compose with other filters (by logical _and_) or to set a `name`.
+If you need something more exotic, you may want to use [gitignoreFilter](docs/gitignoreFilter.md) directly.
+
 # Features
 
  - Reads parent gitignores even if only pointed at a subdirectory
