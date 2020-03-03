@@ -4,7 +4,7 @@ let
   parse-gitignore = import ./rules.nix { inherit lib; };
 in
 rec {
-  inherit (builtins) dirOf baseNameOf abort split hasAttr readFile readDir;
+  inherit (builtins) dirOf baseNameOf abort split hasAttr readFile readDir pathExists;
   inherit (lib.lists) filter length head tail concatMap take;
   inherit (lib.attrsets) filterAttrs mapAttrs attrNames;
   inherit (lib.strings) hasPrefix removePrefix splitString;
@@ -27,7 +27,7 @@ rec {
         localDirPathElements = splitString "/" localDirPath;
         patternResult = parse-gitignore.runFilterPattern (getPatterns patternsBelowP localDirPathElements)."/patterns" path type;
         nonempty = any (nodeName: gitignoreFilter (basePath + "/${nodeName}") != false)
-                       (attrNames (builtins.readDir path));
+                       (attrNames (readDir path));
       in patternResult && (type == "directory" -> nonempty);
 
   getPatterns =
@@ -160,16 +160,21 @@ rec {
   isForbiddenDir = p:
     p == builtins.storeDir || p == "/";
 
-  # TODO: only readDir lazily for the .git type. Rest can be done efficiently with pathExists
   inspectDir = dirPath:
-    let 
+    let
       d = readDir dirPath;
       dotGitType = d.".git" or null;
-      isWorkTreeRoot = dotGitType != null;
+      isWorkTreeRoot = pathExists (dirPath + "/.git");
       gitDir = if dotGitType == nodeTypes.directory then dirPath + "/.git"
                else if dotGitType == nodeTypes.regular then readDotGitFile (dirPath + "/.git")
-               else dotGitType;
-      hasGitignore = (d.".gitignore" or null) == nodeTypes.regular;
+               else if dotGitType == nodeTypes.symlink then throw "gitignore.nix: ${toString dirPath}/.git is a symlink. This is not supported (yet?)."
+               else if dotGitType == null then null
+               else throw "gitignore.nix: ${toString dirPath}/.git is of unknown node type ${dotGitType}";
+
+      # directory should probably be ignored here, but to figure out the node type, we
+      # currently don't have a builtin to do it directly and readDir is expensive,
+      # particularly for a tool like lorri.
+      hasGitignore = pathExists (dirPath + "/.gitignore");
     in { inherit isWorkTreeRoot hasGitignore gitDir dirPath; };
   
   /* .git file path -> GIT_DIR
@@ -198,9 +203,9 @@ rec {
 
   maybeXdgGitConfigFile = 
     for
-      (guardNonEmptyString (/. + builtins.getEnv "XDG_CONFIG_HOME"))
+      (guardNonEmptyString (builtins.getEnv "XDG_CONFIG_HOME"))
       (xdgConfigHome:
-        guardFile (xdgConfigHome + "/git/config")
+        guardFile (/. + xdgConfigHome + "/git/config")
       );
   maybeGlobalConfig = take 1 (guardFile ~/.gitconfig
                            ++ maybeXdgGitConfigFile
@@ -221,9 +226,9 @@ rec {
       )
     );
   xdgExcludesFile = for
-    (guardNonEmptyString (/. + builtins.getEnv "XDG_CONFIG_HOME"))
+    (guardNonEmptyString (builtins.getEnv "XDG_CONFIG_HOME"))
     (xdgConfigHome:
-      guardFile (xdgConfigHome + "/git/ignore")
+      guardFile (/. + xdgConfigHome + "/git/ignore")
     );
   maybeGlobalIgnoresFile = take 1
                             ( globalConfiguredExcludesFile
@@ -252,7 +257,18 @@ rec {
   nullableToList = x: if x == null then [] else [x];
   for = l: f: concatMap f l;
   guard = b: if b then [{}] else [];
-  guardFile = p: if nodeTypes.isFile (safeGetNodeType p) then [p] else [];
+
+  /*
+     Check whether a path exists; if it does, return it as a singleton list.
+
+     Currently it checks whether a path exists, but we'd like to check the
+     node type, so we don't try to readFile for example a directory if we don't
+     have to.
+     It can be done with readDir but this causes lorri to watch everything,
+     which is really bad when reading for example ~/.gitconfig.
+   */
+  # TODO: get something like builtins.pathType or builtins.stat into Nix
+  guardFile = p: if pathExists p then [p] else [];
   guardNonEmptyString = s: if s == "" then [s] else [];
   guardNonNull = a: if a != null then a else [];
 
@@ -280,7 +296,7 @@ rec {
    */
   safeGetNodeType = path:
     if toString path == "/" then nodeTypes.directory
-    else if builtins.pathExists path
+    else if pathExists path
     then let parentDir = readDir (dirOf path);
          in parentDir."${baseNameOf path}" or null
     else null;
