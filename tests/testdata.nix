@@ -38,6 +38,14 @@ let
         touch '6-hash/d' '6-hash/d#0' '6-hash/d\#1' '6-hash/d\\#2'
         touch '6-hash/z' '6-hash/z#0' '6-hash/z\#1' '6-hash/z\\#2'
 
+        mkdir 7-brackets
+        touch '7-brackets/foo - Backup (0).rdl'
+        touch '7-brackets/foo - backup ([0]).rdl'
+        touch '7-brackets/foo - backup 0).rdl'
+        touch '7-brackets/foo - backup (0.rdl'
+        touch '7-brackets/foo - backup 0.rdl'
+        touch '7-brackets/foo - backup 0.rdl'
+
         touches 9-expected       {unfiltered,filtered-via-aux-{filter,ignore,filepath}}
 
         touches 10-subdir-ignoring-itself/foo {foo,bar}
@@ -95,6 +103,9 @@ let
     6-hash/c*\\#
     6-hash/d*\\\#
     6-hash/z*
+
+    # two bracketed classes in one rule
+    7-brackets/*- [Bb]ackup ([0-9]).rdl
   '';
 
   ignoresAux = "/9-expected/*filepath\n";
