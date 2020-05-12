@@ -120,7 +120,7 @@ rec {
         in
           concatStringsSep ""
           (map (rl: if isList rl then slightFix (elemAt rl 0) else f rl)
-          (split "(\\[([^\\\\]|\\\\.)+])" r));
+          (split "(\\[([^]\\\\]|\\\\.)+])" r));
 
       # regex -> regex
       handleSlashPrefix = l:
