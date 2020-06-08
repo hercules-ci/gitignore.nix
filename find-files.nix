@@ -7,7 +7,7 @@ rec {
   inherit (builtins) dirOf baseNameOf abort split hasAttr readFile readDir pathExists;
   inherit (lib.lists) filter length head tail concatMap take;
   inherit (lib.attrsets) filterAttrs mapAttrs attrNames;
-  inherit (lib.strings) hasPrefix removePrefix splitString;
+  inherit (lib.strings) hasPrefix removePrefix splitString toLower;
   inherit (lib) strings flip any;
   inherit lib;
   inherit parse-ini;
@@ -219,7 +219,7 @@ rec {
       globalConfigItems
       ({section, key, value}:
         for
-          (guard (section == "core" && key == "excludesFile"))
+          (guard (toLower section == "core" && toLower key == "excludesfile"))
           (_:
             resolveFile (~/.) value
           )
