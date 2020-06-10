@@ -41,8 +41,25 @@ mkDerivation {
 }
 ```
 
-You can use Nixpkgs' [`cleanSourceWith`](https://github.com/NixOS/nixpkgs/blob/d1bb36d5cb5b78111f799eb26f5f17e5979bc746/lib/sources.nix#L35-L67) to compose with other filters (by logical _and_) or to set a `name`.
-If you need something more exotic, you may want to use [gitignoreFilter](docs/gitignoreFilter.md) directly.
+```
+gitignoreSource :: path -> path
+```
+
+Returns result of cleanSourceWith, usable as a path but also composable.
+
+```
+gitignoreFilter :: path -> (path -> type -> bool)
+
+f = gitignoreFilter path
+```
+
+Parentheses in the type emphasize that a partial application memoizes the git metadata. You can use Nixpkgs' [`cleanSourceWith`](https://github.com/NixOS/nixpkgs/blob/d1bb36d5cb5b78111f799eb26f5f17e5979bc746/lib/sources.nix#L35-L67) to compose with other filters (by logical _and_) or to set a `name`.
+
+`path`: a path being the root or a subdirectory of a local git repository
+
+`f`: a function that returns `false` for files that should be ignored according to gitignore rules, but only for paths at or below `path`.
+
+See [gitignoreFilter](docs/gitignoreFilter.md) for an example.
 
 # Features
 
