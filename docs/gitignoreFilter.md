@@ -16,12 +16,24 @@ let
   gitignore = (import (import ./nix/sources.nix)."gitignore.nix" { inherit lib; });
   inherit (gitignore) gitignoreFilter;
 
-  useGitFilesInSomeWay = src:
+  customerFilter = src:
     let
       # IMPORTANT: use a let binding like this to memoize info about the git directories.
-      f = gitignoreFilter src;
+      srcIgnored = gitignoreFilter src;
     in
-      somethingUseful (path: type: f path type || false);
+      path: type:
+         srcIgnored path type
+           || builtins.baseNameOf path == "i-need-this.xml";
+
+  name = "example";
+  exampleSrc = ./.;
 in
-  useGitFilesInSomeWay ./.
+  mkDerivation {
+    inherit name;
+    src = cleanSourceWith {
+      filter = customerFilter exampleSrc;
+      src = exampleSrc;
+      name = name + "-source";
+    };
+  };
 ```
