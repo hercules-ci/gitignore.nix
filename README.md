@@ -32,6 +32,14 @@ in
   <your nix expression>
 ```
 
+Or using only `nixpkgs/lib` and only evaluation-time fetching:
+
+```nix
+import (builtins.fetchTarball "https://github.com/hercules-ci/gitignore.nix/archive/000000000000000000000000000000000000000000000000000".tar.gz") {
+  lib = import (builtins.fetchTarball "https://github.com/NixOS/nixpkgs/archive/000000000000000000000000000000000000000000000000000".tar.gz" + "/lib");
+}
+```
+
 # Usage
 
 ```nix
