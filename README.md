@@ -12,7 +12,7 @@ Note that although this project does a good job at emulating git's behavior, it 
 ```
 nix-env -iA niv -f https://github.com/nmattia/niv/tarball/master
 niv init
-niv add hercules-ci/gitignore
+niv add hercules-ci/gitignore.nix
 ```
 
 ## Plain Nix way
@@ -21,7 +21,7 @@ niv add hercules-ci/gitignore
 let
   gitignoreSrc = pkgs.fetchFromGitHub { 
     owner = "hercules-ci";
-    repo = "gitignore";
+    repo = "gitignore.nix";
     # put the latest commit sha of gitignore Nix library here:
     rev = "";
     # use what nix suggests in the mismatch message here:
