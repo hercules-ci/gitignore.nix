@@ -15,6 +15,30 @@ niv init
 niv add hercules-ci/gitignore.nix
 ```
 
+## With Flakes
+
+Although Flakes usually process sources within the flake using the git fetcher, which takes care of ignoring in its own peculiar way, you can use gitignore.nix to filter sources outside of a flake. You can load flake-based expressions via `builtins.getFlake (toString ./.)` for example or via [`flake-compat`](https://github.com/edolstra/flake-compat).
+
+```nix
+# // flake.nix
+{
+  inputs.gitignore = {
+    url = "github:hercules-ci/gitignore.nix";
+    # Use the same nixpkgs
+    inputs.nixpkgs.follows = "nixpkgs";
+  };
+  outputs = { self, /* other, inputs, */ gitignore }:
+  let
+    inherit (gitignore.lib) gitignoreSource;
+  in {
+    packages.x86_64.hello = mkDerivation {
+      name = "hello";
+      src = gitignoreSource ./vendored/hello;
+    };
+  };
+}
+```
+
 ## Plain Nix way
 
 ```nix
