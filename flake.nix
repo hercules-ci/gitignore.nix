@@ -6,6 +6,8 @@
       inherit (nixpkgs) lib;
     };
 
-    overlay = final: prev: self.lib;
+    overlay = final: prev: import ./default.nix {
+      inherit (prev) lib;
+    };
   };
 }
