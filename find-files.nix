@@ -18,6 +18,9 @@ rec {
   # TODO: write test for trailing slash (matches dir only)
 
   gitignoreFilter = basePath:
+    gitignoreFilterWith { inherit basePath; };
+
+  gitignoreFilterWith = { basePath }:
     let
       patternsBelowP = findPatternsTree basePath;
       basePathStr = toString basePath;

@@ -35,6 +35,18 @@
         "url": "https://github.com/NixOS/nixpkgs-channels/archive/e6b068cd952e4640d416c2ccd62587d8a35cd774.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
+    "nixos-21.05": {
+        "branch": "nixos-21.05",
+        "description": "Nix Packages collection",
+        "homepage": "",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "3b1789322fcbcb5cf51228d732752714f1bf77da",
+        "sha256": "0m6gcl2pzvicwbflsvmccdyf03ki1zl3d9dl8rn8hj1gdgssj6vr",
+        "type": "tarball",
+        "url": "https://github.com/NixOS/nixpkgs/archive/3b1789322fcbcb5cf51228d732752714f1bf77da.tar.gz",
+        "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
+    },
     "nixpkgs": {
         "branch": "nixos-19.03",
         "description": "Nixpkgs/NixOS branches that track the Nixpkgs/NixOS channels",
