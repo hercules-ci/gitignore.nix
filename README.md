@@ -106,19 +106,20 @@ See [gitignoreFilter](docs/gitignoreFilter.md) for an example.
 
 ## Comparison
 
-| Feature \ Implementation | cleanSource | [siers](https://github.com/siers/nix-gitignore) | [siers recursive](https://github.com/siers/nix-gitignore) | [icetan](https://github.com/icetan/nix-git-ignore-source) | [Profpatsch](https://github.com/Profpatsch/nixperiments/blob/master/filterSourceGitignore.nix) | [numtide](https://github.com/numtide/nix-gitignore) | this project
-|-|-|-|-|-|-|-|-|
-|Ignores .git                             | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ 
-|No special Nix configuration             | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ |   | ✔️ 
-|No import from derivation                | ✔️ | ✔️ |   | ✔️ | ✔️ | ✔️ | ✔️ 
-|Uses subdirectory gitignores             |   |   | ✔️ |   |   | ✔️ | ✔️ 
-|Uses parent gitignores                   |   |   |   |   |   |✔️ ?| ✔️ 
-|Uses user gitignores                     |   |   |   |   |   | ✔️ | ✔️ 
-|Has a test suite                         |   | ✔️ | ✔️ | ✔️ |   | ? | ✔️
-|Works with `restrict-eval` / Hydra       | ✔️ | ✔️ |   | ✔️ | ✔️ |   | ✔️
-|Descends into submodule correctly        |   | ? | ? | ? | ? |✔️ ?| ? #8 
-|Included in nixpkgs                      | ✔️ | ✔️ | ✔️ |   |   |   |
-<!-- |No traversal of ignored dirs             | - | ✔️ |✔️ ?| ✔️ |✔️ ?|✔️ ?| ✔️ ? -->
+| Feature \ Implementation | cleanSource | builtins.fetchGit<br/>/builtins.fetchTree | [siers](https://github.com/siers/nix-gitignore) | [siers recursive](https://github.com/siers/nix-gitignore) | [icetan](https://github.com/icetan/nix-git-ignore-source) | [Profpatsch](https://github.com/Profpatsch/nixperiments/blob/master/filterSourceGitignore.nix) | [numtide](https://github.com/numtide/nix-gitignore) | this project
+|-|-|-|-|-|-|-|-|-|
+|Reproducible                             | ✔️ | ! | ✔️ |✔️ ?| ✔️ |✔️ ?|✔️ ?| ✔️ ? 
+|Ignores .git                             | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ 
+|No special Nix configuration             | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ |   | ✔️ 
+|No import from derivation                | ✔️ | ! | ✔️ |   | ✔️ | ✔️ | ✔️ | ✔️ 
+|Uses subdirectory gitignores             |   | ✔️ |   | ✔️ |   |   | ✔️ | ✔️ 
+|Uses parent gitignores                   |   | ✔️ |   |   |   |   |✔️ ?| ✔️ 
+|Uses user gitignores                     |   | ✔️? |   |   |   |   | ✔️ | ✔️ 
+|Has a test suite                         |   | ✔️?  | ✔️ | ✔️ | ✔️ |   | ? | ✔️
+|Works with `restrict-eval` / Hydra       | ✔️ | ? | ✔️ |   | ✔️ | ✔️ |   | ✔️
+|Descends into submodule correctly        |   | ✔️ | ? | ? | ? | ? |✔️ ?| ? #8 
+|Included in nixpkgs                      | ✔️ | ✔️ | ✔️ | ✔️ |   |   |   |
+|No traversal of ignored dirs<br/>(perf on large repos) | - |   | ✔️ |✔️ ?| ✔️ |✔️ ?|✔️ ?| ✔️ ? 
 
 |   | Legend |
 |---|-------------------------------------|
@@ -127,7 +128,12 @@ See [gitignoreFilter](docs/gitignoreFilter.md) for an example.
 |   | Not supported
 |?  | Probably not supported
 |-  | Not applicable or depends
+|!  | Caveats
 
+Caveats:
+
+ - `fetchGit` is not reproducible. It has at least [one](https://github.com/NixOS/nix/pull/4635) serious reproducibility problem that requires a breaking change to fix. Unlike fixed-output derivations, a built-in fetcher does not have a pinned implementation!
+ - `fetchGit` blocks the evaluator, just like import from derivation
 
 Please open a PR if you've found another feature, determined any of the '?' or found an inaccuracy!
 
