@@ -106,19 +106,21 @@ See [gitignoreFilter](docs/gitignoreFilter.md) for an example.
 
 ## Comparison
 
-| Feature \ Implementation | cleanSource | builtins.fetchGit<br/>/builtins.fetchTree | [siers](https://github.com/siers/nix-gitignore) | [siers recursive](https://github.com/siers/nix-gitignore) | [icetan](https://github.com/icetan/nix-git-ignore-source) | [Profpatsch](https://github.com/Profpatsch/nixperiments/blob/master/filterSourceGitignore.nix) | [numtide](https://github.com/numtide/nix-gitignore) | this project
+| Feature \ Implementation | cleanSource | fetchGit/fetchTree | [siers](https://github.com/siers/nix-gitignore) | [siers recursive](https://github.com/siers/nix-gitignore) | [icetan](https://github.com/icetan/nix-git-ignore-source) | [Profpatsch](https://github.com/Profpatsch/nixperiments/blob/master/filterSourceGitignore.nix) | [numtide](https://github.com/numtide/nix-gitignore) | this project
 |-|-|-|-|-|-|-|-|-|
-|Reproducible                             | ✔️ | ! | ✔️ |✔️ ?| ✔️ |✔️ ?|✔️ ?| ✔️ ? 
-|Ignores .git                             | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ 
-|No special Nix configuration             | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ |   | ✔️ 
-|No import from derivation                | ✔️ | ! | ✔️ |   | ✔️ | ✔️ | ✔️ | ✔️ 
-|Uses subdirectory gitignores             |   | ✔️ |   | ✔️ |   |   | ✔️ | ✔️ 
-|Uses parent gitignores                   |   | ✔️ |   |   |   |   |✔️ ?| ✔️ 
-|Uses user gitignores                     |   | ✔️? |   |   |   |   | ✔️ | ✔️ 
-|Has a test suite                         |   | ✔️?  | ✔️ | ✔️ | ✔️ |   | ? | ✔️
-|Works with `restrict-eval` / Hydra       | ✔️ | ? | ✔️ |   | ✔️ | ✔️ |   | ✔️
-|Descends into submodule correctly        |   | ✔️ | ? | ? | ? | ? |✔️ ?| ? #8 
-|Included in nixpkgs                      | ✔️ | ✔️ | ✔️ | ✔️ |   |   |   |
+|Reproducible                                     | ✔️ | ! | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ✔️
+|Includes added but ignored files                 |   | ✔️ |   |   |   |   | ✔️ |
+|Uses user tooling rules from dotfiles            |   |   | ? |   |   |   |   | ✔️
+|Ignores .git                                     | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ 
+|No special Nix configuration                     | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ |   | ✔️ 
+|No import from derivation                        | ✔️ | ! | ✔️ |   | ✔️ | ✔️ | ✔️ | ✔️ 
+|Uses subdirectory gitignores                     |   | ✔️ |   | ✔️ |   |   | ✔️ | ✔️ 
+|Uses parent gitignores                           |   | ✔️ |   |   |   |   |✔️ ?| ✔️ 
+|Uses user gitignores                             |   |✔️ ?|   |   |   |   | ✔️ | ✔️ 
+|Has a test suite                                 |   |✔️ ?| ✔️ | ✔️ | ✔️ |   | ? | ✔️
+|Works with `restrict-eval` / Hydra               | ✔️ | ? | ✔️ |   | ✔️ | ✔️ |   | ✔️
+|Descends into submodule correctly                |   | ✔️ | ? | ? | ? | ? |✔️ ?| ? #8 
+|Included in nixpkgs                              | ✔️ | ✔️ | ✔️ | ✔️ |   |   |   |
 |No traversal of ignored dirs<br/>(perf on large repos) | - |   | ✔️ |✔️ ?| ✔️ |✔️ ?|✔️ ?| ✔️ ? 
 
 |   | Legend |
