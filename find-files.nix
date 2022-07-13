@@ -204,7 +204,7 @@ rec {
   # Finding git config
   #
 
-  home = if lib.inPureEvalMode then _: /nonexistent else import ./home.nix;
+  home = if lib.inPureEvalMode or false then _: /nonexistent else import ./home.nix;
 
   maybeXdgGitConfigFile = 
     for
