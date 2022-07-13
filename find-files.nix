@@ -204,15 +204,17 @@ rec {
   # Finding git config
   #
 
+  home = if lib.inPureEvalMode or false then _: /nonexistent else import ./home.nix;
+
   maybeXdgGitConfigFile = 
     for
       (guardNonEmptyString (builtins.getEnv "XDG_CONFIG_HOME"))
       (xdgConfigHome:
         guardFile (/. + xdgConfigHome + "/git/config")
       );
-  maybeGlobalConfig = take 1 (guardFile ~/.gitconfig
+  maybeGlobalConfig = take 1 (guardFile (home /.gitconfig)
                            ++ maybeXdgGitConfigFile
-                           ++ guardFile ~/.config/git/config);
+                           ++ guardFile (home /.config/git/config));
 
   globalConfigItems = for maybeGlobalConfig (globalConfigFile:
     parse-ini.parseIniFile globalConfigFile
@@ -224,7 +226,7 @@ rec {
         for
           (guard (toLower section == "core" && toLower key == "excludesfile"))
           (_:
-            resolveFile (~/.) value
+            resolveFile (home /.) value
           )
       )
     );
@@ -236,7 +238,7 @@ rec {
   maybeGlobalIgnoresFile = take 1
                             ( globalConfiguredExcludesFile
                            ++ xdgExcludesFile
-                           ++ guardFile ~/.config/git/ignore);
+                           ++ guardFile (home /.config/git/ignore));
 
   /* Given baseDir, which generalizes the idea of working directory,
      resolve a file path relative to that directory.
@@ -247,7 +249,7 @@ rec {
    */
   resolveFile = baseDir: path: take 1
     (  if hasPrefix "/" path then guardFile (/. + path) else 
-         (if hasPrefix "~" path then guardFile (~/. + removePrefix "~" path) else [])
+         (if hasPrefix "~" path then guardFile (home /. + removePrefix "~" path) else [])
          ++ guardFile (baseDir + "/" + path)
     )
   ;
