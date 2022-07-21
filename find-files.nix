@@ -109,7 +109,13 @@ rec {
     let
       up = inspectDirAndUp path;
       inherit (up) localIgnores gitDir worktreeRoot;
-      globalIgnores = map (file: { contextDir = worktreeRoot; inherit file; }) maybeGlobalIgnoresFile;
+      globalIgnores =
+        if builtins?currentSystem
+        # impure mode: we should account for the user's gitignores as their tooling
+        #              can put impure files in the project
+        then map (file: { contextDir = worktreeRoot; inherit file; }) maybeGlobalIgnoresFile
+        # pure mode: we hope that all ignores are also in the project .gitignore
+        else [];
 
       # TODO: can local config override global core.excludesFile?
       # localConfigItems = parse-ini.parseIniFile (gitDir + "/config");
