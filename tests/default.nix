@@ -22,4 +22,20 @@ in
   subdir-9 = runner.makeTest { name = "subdir-9"; rootDir = testdata.sourceUnfiltered + "/test-tree"; subpath = "9-expected"; };
   subdir-10 = runner.makeTest { name = "subdir-10"; rootDir = testdata.sourceUnfiltered + "/test-tree"; subpath = "10-subdir-ignoring-itself"; };
 
+  unit-tests =
+    let gitignoreNix = import ../default.nix { inherit (pkgs) lib; };
+        inherit (gitignoreNix) gitignoreFilterWith;
+        example = gitignoreFilterWith { basePath = ./.; extraRules = ''
+          *.foo
+          !*.bar
+        ''; };
+    in
+
+    # Test that extraRules works:
+    assert example ./x.foo "regular" == false;
+    assert example ./x.bar "regular" == true;
+    assert example ./x.qux "regular" == true;
+
+    # End of test. (a drv to show a buildable attr when successful)
+    pkgs.emptyFile or null;
 }
