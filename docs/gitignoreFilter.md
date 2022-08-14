@@ -14,16 +14,18 @@ for paths at or below this root path.
 ```nix
 let
   gitignore = (import (import ./nix/sources.nix)."gitignore.nix" { inherit lib; });
-  inherit (gitignore) gitignoreFilter;
+  inherit (gitignore) gitignoreFilterWith;
 
   customerFilter = src:
     let
       # IMPORTANT: use a let binding like this to memoize info about the git directories.
-      srcIgnored = gitignoreFilter src;
+      srcIgnored = gitignoreFilterWith { basePath = src; extraRules = ''
+        *.xml
+        !i-need-this.xml
+      ''; };
     in
       path: type:
-         srcIgnored path type
-           || builtins.baseNameOf path == "i-need-this.xml";
+         srcIgnored path type && baseNameOf path != "just-an-example-of-custom-filter-code.out";
 
   name = "example";
   exampleSrc = ./.;

@@ -20,9 +20,12 @@ rec {
   gitignoreFilter = basePath:
     gitignoreFilterWith { inherit basePath; };
 
-  gitignoreFilterWith = { basePath }:
+  gitignoreFilterWith = { basePath, extraRules ? null, extraRulesWithContextDir ? [] }:
+    assert extraRules == null || builtins.typeOf extraRules == "string";
     let
-      patternsBelowP = findPatternsTree basePath;
+      extraRules2 = extraRulesWithContextDir ++ 
+        lib.optional (extraRules != null) { contextDir = basePath; rules = extraRules; };
+      patternsBelowP = findPatternsTree extraRules2 basePath;
       basePathStr = toString basePath;
     in
       path: type: let
@@ -60,11 +63,11 @@ rec {
      The patterns are mixed into the attrsets using the special key "/patterns".
      Leaves are simply {}
    */
-  findPatternsTree = dir:
+  findPatternsTree = extraRules: dir:
     let
-      listOfStartingPatterns = map ({contextDir, file, ...}: 
-                                 parse-gitignore.gitignoreFilter (readFile file) contextDir
-                              ) (findAncestryGitignores dir);
+      listOfStartingPatterns = map ({contextDir, rules ? readFile file, file ? throw "gitignore.nix: A `file` or `rules` attribute is required in extraRulesWithContextDir items.", ...}: 
+                                 parse-gitignore.gitignoreFilter rules contextDir
+                              ) (findAncestryGitignores dir ++ extraRules);
       startingPatterns = builtins.foldl'
                            parse-gitignore.mergePattern
                            (defaultPatterns dir) # not the unit of merge but a set of defaults
