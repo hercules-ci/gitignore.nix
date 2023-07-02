@@ -23,7 +23,7 @@ let
   gitignoreSourceWith = { path }:
     lib.cleanSourceWith {
       name = "source";
-      filter = find-files.gitignoreFilterWith { basePath = path.origPath or path; };
+      filter = find-files.gitignoreFilterWith { basePath = path.origSrc or path; };
       src = path;
     };
 
