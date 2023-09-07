@@ -1,5 +1,5 @@
 {
-  description = "Nix functions for filtering local git sources";
+  description = "Nix functions for filtering local sources";
 
   outputs = { self, nixpkgs }: {
     lib = import ./default.nix {
