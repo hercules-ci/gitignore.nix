@@ -10,5 +10,7 @@
       import ./default.nix {
         inherit (prev) lib;
       };
+
+    checks.x86_64-linux = import ./tests { pkgs = nixpkgs.legacyPackages.x86_64-linux; };
   };
 }
