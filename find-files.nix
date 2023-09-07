@@ -2,6 +2,7 @@
 let
   parse-ini = import ./parse-git-config.nix { inherit lib; };
   parse-gitignore = import ./rules.nix { inherit lib; };
+  path = import ./lib/path.nix { inherit lib; };
 in
 rec {
   inherit (builtins) dirOf baseNameOf abort split hasAttr readFile readDir pathExists;
@@ -27,14 +28,20 @@ rec {
         lib.optional (extraRules != null) { contextDir = basePath; rules = extraRules; };
       patternsBelowP = findPatternsTree extraRules2 basePath;
       basePathStr = toString basePath;
-    in
-      path: type: let
-        localDirPath = removePrefix basePathStr (toString (dirOf path));
-        localDirPathElements = splitString "/" localDirPath;
-        patternResult = parse-gitignore.runFilterPattern (getPatterns patternsBelowP localDirPathElements)."/patterns" path type;
-        nonempty = any (nodeName: gitignoreFilter (basePath + "/${nodeName}") != false)
-                       (attrNames (readDir path));
-      in patternResult && (type == "directory" -> nonempty);
+      rawFilter =
+        path: type: let
+          localDirPath = removePrefix basePathStr (toString (dirOf path));
+          localDirPathElements = splitString "/" localDirPath;
+          patternResult = parse-gitignore.runFilterPattern (getPatterns patternsBelowP localDirPathElements)."/patterns" path type;
+          contents = readDir path;
+          nonempty = localDirPathElements == [] || any (nodeName: memoFilter (path + "/${nodeName}") != false)
+                        (attrNames contents);
+        in patternResult && (type == "directory" -> nonempty);
+      memoFilter =
+        path.memoize rawFilter
+          (p: throw "Could not find path ${toString p} in memo table. Did path or filtering semantics change?")
+          basePath;
+    in path: type: memoFilter path;
 
   getPatterns =
     patternTree: pathElems:

@@ -54,6 +54,9 @@ let
         mkdir 12-empty-dir
         mkdir 12-not-empty-dir
         touch 12-not-empty-dir/just-a-regular-file
+
+        mkdir 13-dir-with-ignored-contents
+        touches 13-dir-with-ignored-contents/{foo,bar}
     ); }
 
     create-tree "$1"
@@ -106,6 +109,8 @@ let
 
     # two bracketed classes in one rule
     7-brackets/*- [Bb]ackup ([0-9]).rdl
+
+    13-dir-with-ignored-contents/*
   '';
 
   ignoresAux = "/9-expected/*filepath\n";
