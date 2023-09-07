@@ -14,6 +14,7 @@ let
   #   absolutePathComponentsBetween /a     /a/b/c == ["b" "c"]
   #   absolutePathComponentsBetween /a/b/c /a/b/c == []
   absolutePathComponentsBetween =
+    # TODO: port the tests from https://github.com/NixOS/nixpkgs/pull/112083
     ancestor: descendant:
       let
         a' = /. + ancestor;
@@ -42,6 +43,8 @@ let
     missing:
     # Filesystem location below which the returned function is defined. `/.` may be acceptable, but a path closer to the data of interest is better.
     root:
+
+    # TODO: port the tests from https://github.com/NixOS/nixpkgs/pull/112083
 
     let
       makeTree = dir: type: {
