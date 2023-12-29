@@ -4,7 +4,8 @@
 This goal of this project lets you include local sources in your [Nix](https://builtwithnix.org) projects,
 while taking [gitignore files](https://git-scm.com/docs/gitignore) into account.
 
-Note that although this project does a good job at emulating git's behavior, it is not the same implementation!
+> [!Note]
+> Although this project does a good job at emulating git's behavior, it is not the same implementation! It is unaware of the git "index" and committed files, and therefore unaware of files that are in the index despite gitignore.
 
 # Installation
 
@@ -137,14 +138,14 @@ Caveats:
  - `fetchGit` is not reproducible. It has at least [one](https://github.com/NixOS/nix/pull/4635) serious reproducibility problem that requires a breaking change to fix. Unlike fixed-output derivations, a built-in fetcher does not have a pinned implementation!
  - `fetchGit` blocks the evaluator, just like import from derivation
 
-Please open a PR if you've found another feature, determined any of the '?' or found an inaccuracy!
+Please open a PR if you've found another feature, determined any of the '?' or if you've found an inaccuracy.
 
 # Security
 
 Files not matched by gitignore rules will end up in the Nix store, which is readable by any process.
 
 gitignore.nix does not yet understand `git-crypt`'s metadata, so don't call `gitignoreSource` on directories containing such secrets or their parent directories.
-This applies to any Nix function that uses the `builtins.path` or `builtins.filterSource` functions.
+This also applies to many Nix functions (`path`, `filterSource`, `cleanSource`, etc) and Nix string interpolation.
 
 # Contributing
 
