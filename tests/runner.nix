@@ -24,11 +24,11 @@ let
                                discover rootDir by itself.
 
    */
-  makeTest = {name ? "source", rootDir, subpath ? ""}:
+  makeTest = {name ? "source", rootDir, subpath ? "", preCheck ? ""}:
     pkgs.runCommand "test-${name}" {
       inherit name;
       viaGit = listingViaGit { inherit name rootDir subpath; };
-      viaNix = listingViaNixGitignore { inherit name rootDir subpath; };
+      viaNix = listingViaNixGitignore { inherit name rootDir subpath preCheck; };
     } ''
       if diff $viaNix $viaGit; then
         touch $out
@@ -64,7 +64,7 @@ let
       installPhase = ":";
     };
 
-  listingViaNixGitignore = {name ? "source", rootDir, subpath}:
+  listingViaNixGitignore = {name ? "source", rootDir, subpath, preCheck}:
     pkgs.stdenv.mkDerivation {
       name = "${name}-listing-via-nix";
       src = rootDir;
@@ -79,6 +79,7 @@ let
         export NIX_LOG_DIR=$TMPDIR
         export NIX_STATE_DIR=$TMPDIR
         test -n "$subpath" && cd $subpath
+        ${preCheck}
         nix-instantiate --eval --expr --json \
             --readonly-mode --option sandbox false \
             '(import ${gitignoreSource ../.}/tests/runner.nix {}).toStringNixGitignore ./.' \
