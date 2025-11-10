@@ -242,7 +242,12 @@ rec {
         for
           (guard (toLower section == "core" && toLower key == "excludesfile"))
           (_:
-            resolveFile (home /.) value
+            # Paths with context can't be appended to other paths, so we have to
+            # remove the context here.
+            # SAFETY: gitignore.nix is not responsible for making sure the
+            # store paths pointed to in your global git config have been
+            # realised.
+            resolveFile (home /.) (builtins.unsafeDiscardStringContext value)
           )
       )
     );
@@ -290,7 +295,7 @@ rec {
    */
   # TODO: get something like builtins.pathType or builtins.stat into Nix
   guardFile = p: if pathExists p then [p] else [];
-  guardNonEmptyString = s: if s == "" then [s] else [];
+  guardNonEmptyString = s: if s == "" then [] else [s];
   guardNonNull = a: if a != null then a else [];
 
 
