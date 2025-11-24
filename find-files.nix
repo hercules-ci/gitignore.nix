@@ -157,11 +157,15 @@ rec {
             then [{ contextDir = di.dirPath; file = di.dirPath + "/.gitignore"; }]
             else [];
 
+          infoExclude = if dirInfo.gitDir != null && pathExists (dirInfo.gitDir + "/info/exclude")
+            then [{ contextDir = dirInfo.dirPath; file = dirInfo.gitDir + "/info/exclude"; }]
+            else [];
+
         in
           if isHighest || isForbiddenDir (toString parentDir)
           then
             {
-              localIgnores = concatMap getIgnores dirs;
+              localIgnores = concatMap getIgnores dirs ++ infoExclude;
               worktreeRoot = p;
               inherit (dirInfo) gitDir;
             }
